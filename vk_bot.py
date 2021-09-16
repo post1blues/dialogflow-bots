@@ -2,8 +2,14 @@ import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from environs import Env
+import telegram
+import logging
 
 from dialogflow_api import detect_intent_texts
+from logging_handlers import TelegramLogsHandler
+
+
+logger = logging.getLogger("vk_logger")
 
 
 def send_answer(event, vk_api):
@@ -33,5 +39,13 @@ if __name__ == "__main__":
     env = Env()
     env.read_env(".env")
     VK_BOT_TOKEN = env("VK_BOT_TOKEN")
+
+    TG_BOT_TOKEN = env("TG_BOT_TOKEN")
+    LOG_CHAT_ID = env("LOG_CHAT_ID")
+
+    tg_bot = telegram.Bot(token=TG_BOT_TOKEN)
+
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, tg_bot))
 
     start_bot(VK_BOT_TOKEN)

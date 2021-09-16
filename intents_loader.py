@@ -2,11 +2,7 @@ from google.cloud import dialogflow
 from environs import Env
 import json
 from google.api_core.exceptions import InvalidArgument
-
-env = Env()
-env.read_env(".env")
-
-DIALOGFLOW_PROJECT_ID = env("DIALOGFLOW_PROJECT_ID")
+import argparse
 
 
 def read_file_to_json(filename):
@@ -37,8 +33,9 @@ def create_intent(display_name, training_phrases_parts, message_texts):
     )
 
 
-def main():
-    questions = read_file_to_json("questions.json")
+def main(filename):
+
+    questions = read_file_to_json(filename)
     for topic, training_data in questions.items():
         try:
             create_intent(topic, training_data["questions"], [training_data["answer"]])
@@ -47,5 +44,14 @@ def main():
             print(f"{topic} is already exists")
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    env = Env()
+    env.read_env(".env")
+
+    DIALOGFLOW_PROJECT_ID = env("DIALOGFLOW_PROJECT_ID")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", metavar="", help="name of file with questions")
+    args = parser.parse_args()
+
+    main(args.filename)
