@@ -19,6 +19,8 @@ def send_answer(update, context):
 
 
 def start_bot(bot_token):
+    logger.warning("VK bot starts working")
+
     updater = Updater(bot_token)
 
     dispatcher = updater.dispatcher

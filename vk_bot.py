@@ -27,6 +27,8 @@ def send_answer(event, vk_api):
 
 
 def start_bot(bot_token):
+    logger.warning("VK bot starts working")
+
     vk_session = vk.VkApi(token=bot_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
