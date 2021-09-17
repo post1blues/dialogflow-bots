@@ -3,6 +3,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from environs import Env
 import logging
+import textwrap
 
 from dialogflow_api import detect_intent_texts
 from logging_handlers import TelegramLogsHandler
@@ -13,17 +14,21 @@ logger = logging.getLogger("vk_logger")
 
 def send_answer(event, vk_api):
     message = event.text
-    session_id = event.user_id
-    response_message = detect_intent_texts(session_id, message)
+    user_id = event.user_id
+    response_message = detect_intent_texts(user_id, message)
 
     if response_message:
         vk_api.messages.send(
-            user_id=event.user_id,
+            user_id=user_id,
             message=response_message,
             random_id=get_random_id()
         )
     else:
-        logger.warning("User wrote in vk.com, but DialogFlow don't know what to answer.")
+        response_message = f"""\
+        Пользователь {user_id} оставил сообщение в vk.com.
+        Бот не знает, что ответить, поэтому требуется присутствие менеджера!
+        """
+        logger.warning(textwrap.dedent(response_message))
 
 
 def start_bot(bot_token):

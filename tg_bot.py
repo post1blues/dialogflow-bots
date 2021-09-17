@@ -1,6 +1,7 @@
 from telegram.ext import Updater, MessageHandler, Filters
 from environs import Env
 import logging
+import textwrap
 
 from dialogflow_api import detect_intent_texts
 from logging_handlers import TelegramLogsHandler
@@ -15,7 +16,11 @@ def send_answer(update, context):
     if response_message:
         update.message.reply_text(response_message)
     else:
-        logger.warning("User wrote in telegram, but DialogFlow don't know what to answer.")
+        response_message = f"""\
+                Пользователь {user_id} оставил сообщение в vk.com.
+                Бот не знает, что ответить, поэтому требуется присутствие менеджера!
+                """
+        logger.warning(textwrap.dedent(response_message))
 
 
 def start_bot(bot_token):
