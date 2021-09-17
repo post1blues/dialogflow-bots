@@ -2,7 +2,6 @@ import vk_api as vk
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from environs import Env
-import telegram
 import logging
 
 from dialogflow_api import detect_intent_texts
@@ -23,6 +22,8 @@ def send_answer(event, vk_api):
             message=response_message,
             random_id=get_random_id()
         )
+    else:
+        logger.warning("User wrote in vk.com, but DialogFlow don't know what to answer.")
 
 
 def start_bot(bot_token):
@@ -43,9 +44,7 @@ if __name__ == "__main__":
     TG_BOT_TOKEN = env("TG_BOT_TOKEN")
     LOG_CHAT_ID = env("LOG_CHAT_ID")
 
-    tg_bot = telegram.Bot(token=TG_BOT_TOKEN)
-
     logger.setLevel(logging.WARNING)
-    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, tg_bot))
+    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, TG_BOT_TOKEN))
 
     start_bot(VK_BOT_TOKEN)

@@ -1,4 +1,5 @@
 *.json
 .env
+sample.env
 .idea/
 __pycache__/

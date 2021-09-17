@@ -3,6 +3,10 @@ from environs import Env
 import json
 from google.api_core.exceptions import InvalidArgument
 import argparse
+import logging
+
+
+logger = logging.getLogger("intents_loader")
 
 
 def read_file_to_json(filename):
@@ -34,14 +38,14 @@ def create_intent(display_name, training_phrases_parts, message_texts):
 
 
 def main(filename):
-
+    logger.warning("Start loading intents into DialogFlow")
     questions = read_file_to_json(filename)
     for topic, training_data in questions.items():
         try:
             create_intent(topic, training_data["questions"], [training_data["answer"]])
-            print(f"{topic} is added")
+            logger.warning(f"{topic} is added")
         except InvalidArgument:
-            print(f"{topic} is already exists")
+            logger.error(f"{topic} is already exists")
 
 
 if __name__ == "__main__":
@@ -53,5 +57,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", metavar="", help="name of file with questions")
     args = parser.parse_args()
+
+    logger.setLevel(logging.WARNING)
 
     main(args.filename)

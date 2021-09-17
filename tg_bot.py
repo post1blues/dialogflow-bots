@@ -1,6 +1,5 @@
 from telegram.ext import Updater, MessageHandler, Filters
 from environs import Env
-import telegram
 import logging
 
 from dialogflow_api import detect_intent_texts
@@ -12,9 +11,11 @@ logger = logging.getLogger("tg_logger")
 def send_answer(update, context):
     user_id = update.effective_user.id
     user_message = update.message.text
-    answer = detect_intent_texts(user_id, user_message, language_code="ru")
-    if answer:
-        update.message.reply_text(answer)
+    response_message = detect_intent_texts(user_id, user_message, language_code="ru")
+    if response_message:
+        update.message.reply_text(response_message)
+    else:
+        logger.warning("User wrote in telegram, but DialogFlow don't know what to answer.")
 
 
 def start_bot(bot_token):
@@ -31,13 +32,10 @@ if __name__ == '__main__':
     env = Env()
     env.read_env(".env")
 
-    tg_bot_token = env("TG_BOT_TOKEN")
-    log_chat_id = env("LOG_CHAT_ID")
-
-    tg_bot = telegram.Bot(token=tg_bot_token)
+    TG_BOT_TOKEN = env("TG_BOT_TOKEN")
+    LOG_CHAT_ID = env("LOG_CHAT_ID")
 
     logger.setLevel(logging.WARNING)
-    logger.addHandler(TelegramLogsHandler(log_chat_id, tg_bot))
+    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, TG_BOT_TOKEN))
 
-    while True:
-        start_bot(tg_bot_token)
+    start_bot(TG_BOT_TOKEN)
