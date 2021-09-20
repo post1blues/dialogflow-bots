@@ -43,15 +43,19 @@ def start_bot(bot_token):
             send_answer(event, vk_api)
 
 
-if __name__ == "__main__":
+def main():
     env = Env()
     env.read_env(".env")
-    VK_BOT_TOKEN = env("VK_BOT_TOKEN")
+    vk_bot_token = env("VK_BOT_TOKEN")
 
-    TG_BOT_TOKEN = env("TG_BOT_TOKEN")
-    LOG_CHAT_ID = env("LOG_CHAT_ID")
+    tg_bot_token = env("TG_BOT_TOKEN")
+    log_chat_id = env("LOG_CHAT_ID")
 
     logger.setLevel(logging.WARNING)
-    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, TG_BOT_TOKEN))
+    logger.addHandler(TelegramLogsHandler(log_chat_id, tg_bot_token))
 
-    start_bot(VK_BOT_TOKEN)
+    start_bot(vk_bot_token)
+
+
+if __name__ == "__main__":
+    main()

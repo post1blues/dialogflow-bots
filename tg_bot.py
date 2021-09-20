@@ -15,12 +15,6 @@ def send_answer(update, context):
     response_message = detect_intent_texts(user_id, user_message, language_code="ru")
     if response_message:
         update.message.reply_text(response_message)
-    else:
-        response_message = f"""\
-                Пользователь {user_id} оставил сообщение в vk.com.
-                Бот не знает, что ответить, поэтому требуется присутствие менеджера!
-                """
-        logger.warning(textwrap.dedent(response_message))
 
 
 def start_bot(bot_token):
@@ -35,14 +29,18 @@ def start_bot(bot_token):
     updater.idle()
 
 
-if __name__ == '__main__':
+def main():
     env = Env()
     env.read_env(".env")
 
-    TG_BOT_TOKEN = env("TG_BOT_TOKEN")
-    LOG_CHAT_ID = env("LOG_CHAT_ID")
+    tg_bot_token = env("TG_BOT_TOKEN")
+    log_chat_id = env("LOG_CHAT_ID")
 
     logger.setLevel(logging.WARNING)
-    logger.addHandler(TelegramLogsHandler(LOG_CHAT_ID, TG_BOT_TOKEN))
+    logger.addHandler(TelegramLogsHandler(log_chat_id, tg_bot_token))
 
-    start_bot(TG_BOT_TOKEN)
+    start_bot(tg_bot_token)
+
+
+if __name__ == '__main__':
+    main()
