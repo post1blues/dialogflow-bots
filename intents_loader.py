@@ -15,10 +15,10 @@ def read_file_to_json(filename):
     return json.loads(questions)
 
 
-def create_intent(display_name, training_phrases_parts, message_texts):
+def create_intent(project_id, display_name, training_phrases_parts, message_texts):
     intents_client = dialogflow.IntentsClient()
 
-    parent = dialogflow.AgentsClient.agent_path(DIALOGFLOW_PROJECT_ID)
+    parent = dialogflow.AgentsClient.agent_path(project_id)
     training_phrases = []
     for training_phrases_part in training_phrases_parts:
         part = dialogflow.Intent.TrainingPhrase.Part(text=training_phrases_part)
@@ -37,27 +37,28 @@ def create_intent(display_name, training_phrases_parts, message_texts):
     )
 
 
-def main(filename):
+def main():
+    env = Env()
+    env.read_env(".env")
+
+    dialogflow_project_id = env("DIALOGFLOW_PROJECT_ID")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", metavar="", help="name of file with questions")
+    args = parser.parse_args()
+
+    filename = args.filename
+
+    logger.setLevel(logging.WARNING)
     logger.warning("Start loading intents into DialogFlow")
     questions = read_file_to_json(filename)
     for topic, training_data in questions.items():
         try:
-            create_intent(topic, training_data["questions"], [training_data["answer"]])
+            create_intent(dialogflow_project_id, topic, training_data["questions"], [training_data["answer"]])
             logger.warning(f"{topic} is added")
         except InvalidArgument:
             logger.error(f"{topic} is already exists")
 
 
 if __name__ == "__main__":
-    env = Env()
-    env.read_env(".env")
-
-    DIALOGFLOW_PROJECT_ID = env("DIALOGFLOW_PROJECT_ID")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("filename", metavar="", help="name of file with questions")
-    args = parser.parse_args()
-
-    logger.setLevel(logging.WARNING)
-
-    main(args.filename)
+    main()
